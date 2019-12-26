@@ -1,0 +1,20 @@
+FROM maven:3.6-jdk-11 as build
+RUN mkdir /jb3
+WORKDIR /jb3
+ADD pom.xml pom.xml
+ADD src src
+
+RUN echo "spring.data.mongodb.host=mongodb" >> /jb3/src/main/resources/config/application.properties
+
+
+# RUN mvn dependency:resolve && mvn verify && mvn package
+RUN mvn package
+
+FROM adoptopenjdk/openjdk11:alpine-slim as distribution
+
+WORKDIR /code
+
+COPY --from=build /jb3/target/jb3-1.2-SNAPSHOT.jar /code/
+
+EXPOSE 8080
+ENTRYPOINT java -jar jb3-1.2-SNAPSHOT.jar

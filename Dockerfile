@@ -4,7 +4,7 @@ FROM adoptopenjdk/maven-openjdk11
 RUN apt-get update
 
 # Install mongodb
-RUN apt-get install -y mongodb-server
+RUN apt-get install -y mongodb-server && rm -rf /var/lib/apt/lists/*
 RUN service mongodb start
 
 WORKDIR /code

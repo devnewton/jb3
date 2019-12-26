@@ -1,0 +1,15 @@
+version: "2"
+services:
+  tribune:
+    image: jb3
+    ports:
+    - "8080:8080"
+    depends_on:
+    - mongodb
+  mongodb:
+    image: mongo
+    restart: always
+    volumes:
+      - './data:/data/db'
+    ports:
+      - "27017:27017"
