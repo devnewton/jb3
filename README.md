@@ -2,6 +2,7 @@
 
 jb3 is a KISS tribune powered by java, spring boot and mongodb.
 
+![](https://github.com/devnewton/jb3/workflows/Java%20CI/badge.svg)
 ## Features
 
 - archives
@@ -56,11 +57,13 @@ Implemented gateways:
 # Build and run demo using [docker](https://www.docker.com/)
 
 Run the following commands:
-
-    docker build --tag=jb3 https://github.com/devnewton/jb3.git
-    docker run -p 8080:8080 jb3
+```bash
+    docker build --tag=jb3 https://github.com/devnewton/jb3.git -f Dockerfile.jb3only
+    docker-compose up -d
+```
 
 Then access to the jb3 application using a web browser on http://localhost:8080
+This will runs two docker container, one for jb3 and one for mongodb. Mongodb data will be stored locally in *data* folder, allowing to keep it between runs.
 
 # How to use
 
