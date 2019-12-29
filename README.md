@@ -54,13 +54,21 @@ Implemented gateways:
 - ototu
 - sveetch
 
-# Build and run demo using [docker](https://www.docker.com/)
+# Run demo using [docker](https://www.docker.com/)
+A docker image exists, see [Package](https://github.com/devnewton/jb3/packages).
 
-Run the following commands:
+Using provided docker-compose file, simply run the following command:
+
 ```bash
-    docker build --tag=jb3 https://github.com/devnewton/jb3.git -f Dockerfile.jb3only
-    docker-compose up -d
+docker-compose up -d
 ```
+It uses github docker registry. You may need to authenticate before, in order to pull image.
+```bash
+docker login -u USERNAME -p TOKEN docker.pkg.github.com
+```
+
+See [Github help](https://help.github.com/en/github/managing-packages-with-github-packages/configuring-docker-for-use-with-github-packages#authenticating-to-github-packages) for more details
+
 
 Then access to the jb3 application using a web browser on http://localhost:8080
 This will runs two docker container, one for jb3 and one for mongodb. Mongodb data will be stored locally in *data* folder, allowing to keep it between runs.

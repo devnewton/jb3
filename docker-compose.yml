@@ -1,7 +1,7 @@
 version: "2"
 services:
   tribune:
-    image: jb3
+    image: docker.pkg.github.com/devnewton/jb3/jb3:latest
     ports:
     - "8080:8080"
     depends_on:
