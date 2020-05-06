@@ -9,13 +9,13 @@ import org.springframework.stereotype.Component;
  */
 @ConditionalOnExpression("'${jb3.defaults.room:}' != 'gabuzomeu'")
 @Component
-public class GabuzomeuGateway extends AbstractWebdirectcoinGateway {
+public class GabuzomeuGateway extends AbstractSSECoinGateway {
     
     private static Jb3BouchotConfig createConf() {
         Jb3BouchotConfig config = new Jb3BouchotConfig();
         config.setLocalRoom("gabuzomeu");
         config.setRemoteRoom("gabuzomeu");
-        config.setWebdirectcoinURL("https://jb3.plop.cc/webdirectcoin");
+        config.setUrl("https://jb3.plop.cc");
         return config;
     }
 

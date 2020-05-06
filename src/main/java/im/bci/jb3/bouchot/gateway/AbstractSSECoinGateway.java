@@ -1,26 +1,25 @@
 package im.bci.jb3.bouchot.gateway;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import im.bci.jb3.bouchot.data.Post;
 import im.bci.jb3.bouchot.data.PostRepository;
 import im.bci.jb3.bouchot.data.PostRevision;
 import im.bci.jb3.bouchot.logic.CleanUtils;
-import im.bci.jb3.bouchot.websocket.messages.MessageC2S;
-import im.bci.jb3.bouchot.websocket.messages.MessageS2C;
-import im.bci.jb3.bouchot.websocket.messages.c2s.GetC2S;
-import im.bci.jb3.bouchot.websocket.messages.c2s.PostC2S;
 import im.bci.jb3.event.NewPostsEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.WebSocket;
-import okhttp3.WebSocketListener;
+import okhttp3.sse.EventSource;
+import okhttp3.sse.EventSourceListener;
+import okhttp3.sse.EventSources;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,11 +32,13 @@ import org.springframework.scheduling.TaskScheduler;
  *
  * @author devnewton
  */
-public abstract class AbstractWebdirectcoinGateway extends WebSocketListener implements Gateway {
+public abstract class AbstractSSECoinGateway extends EventSourceListener implements Gateway {
 
     private final Log LOGGER = LogFactory.getLog(this.getClass());
     @Autowired
     private OkHttpClient httpClient;
+    @Autowired
+    private EventSource.Factory eventSourceFactory;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
@@ -46,44 +47,38 @@ public abstract class AbstractWebdirectcoinGateway extends WebSocketListener imp
     private PostRepository postPepository;
     @Resource(name = "mouleScheduler")
     private TaskScheduler scheduler;
-    private WebSocket ws;
     private final Jb3BouchotConfig config;
     private int nbConnexionFailOrClose;
 
-    public AbstractWebdirectcoinGateway(Jb3BouchotConfig config) {
+    public AbstractSSECoinGateway(Jb3BouchotConfig config) {
         this.config = config;
     }
 
     @PostConstruct
     public void connect() {
         scheduler.schedule(() -> {
-            Request request = new Request.Builder().url(config.getWebdirectcoinURL()).build();
-            httpClient.newWebSocket(request, this);
+            Request request = new Request.Builder().url(config.getUrl() + "/ssecoin/posts/stream?rooms=" + config.getRemoteRoom()).build();
+            eventSourceFactory.newEventSource(request, this);
         }, DateTime.now().plusMinutes(nbConnexionFailOrClose).toDate());
     }
 
     @Override
-    public synchronized void onOpen(WebSocket ws, Response response) {
-        try {
+    public void onOpen(EventSource eventSource, Response response) {
+        if (response.isSuccessful()) {
             nbConnexionFailOrClose = Math.max(0, nbConnexionFailOrClose - 1);
-            this.ws = ws;
-            MessageC2S message = new MessageC2S();
-            GetC2S get = new GetC2S();
-            get.setRoom(config.getRemoteRoom());
-            message.setGet(get);
-            ws.send(objectMapper.writeValueAsString(message));
-            LOGGER.info("Connected to " + config.getLocalRoom());
-        } catch (JsonProcessingException ex) {
-            LOGGER.error(ex);
         }
     }
 
     @Override
-    public void onMessage(WebSocket webSocket, String text) {
+    public void onEvent(EventSource eventSource, String id, String type, String data) {
         try {
-            MessageS2C webDirectCoinMessage = objectMapper.readValue(text, MessageS2C.class);
-            if (null != webDirectCoinMessage.getPosts()) {
-                importPosts(webDirectCoinMessage.getPosts());
+            if ("presence".equals(type)) {
+                //TODO broadcast presence ?
+            } else {
+                Post post = objectMapper.readValue(data, Post.class);
+                if (null != post) {
+                    importPosts(Arrays.asList(post));
+                }
             }
         } catch (IOException ex) {
             LOGGER.error(ex);
@@ -94,15 +89,20 @@ public abstract class AbstractWebdirectcoinGateway extends WebSocketListener imp
     public synchronized boolean handlePost(String nickname, String messageBody, String room, String auth) {
         if (StringUtils.equals(config.getLocalRoom(), room)) {
             try {
-                if (null != this.ws) {
-                    MessageC2S message = new MessageC2S();
-                    PostC2S post = new PostC2S();
-                    post.setAuth(auth);
-                    post.setMessage(messageBody);
-                    post.setNickname(nickname);
-                    post.setRoom(config.getRemoteRoom());
-                    message.setPost(post);
-                    ws.send(objectMapper.writeValueAsString(message));
+                RequestBody formBody = new FormBody.Builder()
+                        .add("nickname", nickname)
+                        .add("message", messageBody)
+                        .add("room", config.getRemoteRoom())
+                        .add("auth", auth)
+                        .build();
+                Request request = new Request.Builder()
+                        .url(config.getUrl() + "/ssecoin/posts/add")
+                        .post(formBody)
+                        .build();
+                try (Response response = httpClient.newCall(request).execute()) {
+                    if (!response.isSuccessful()) {
+                        throw new IOException("Unexpected code " + response);
+                    }
                 }
             } catch (Exception ex) {
                 LOGGER.error(ex);
@@ -136,14 +136,14 @@ public abstract class AbstractWebdirectcoinGateway extends WebSocketListener imp
     }
 
     @Override
-    public void onClosed(WebSocket webSocket, int code, String reason) {
-        LOGGER.info("Disconnected from " + config.getLocalRoom() + ": " + code + " " + reason);
+    public void onClosed(EventSource eventSource) {
+        LOGGER.info("Disconnected from " + config.getLocalRoom());
         nbConnexionFailOrClose = Math.min(30, nbConnexionFailOrClose + 1);
         this.connect();
     }
 
     @Override
-    public void onFailure(WebSocket webSocket, Throwable t, Response response) {
+    public void onFailure(EventSource eventSource, Throwable t, Response response) {
         LOGGER.error("Connection failure from " + config.getLocalRoom(), t);
         nbConnexionFailOrClose = Math.min(30, nbConnexionFailOrClose + 1);
         this.connect();

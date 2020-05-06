@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import im.bci.jb3.bouchot.data.Post;
 import im.bci.jb3.bouchot.logic.CleanUtils;
-import im.bci.jb3.bouchot.websocket.messages.data.Presence;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ResponseStatus;

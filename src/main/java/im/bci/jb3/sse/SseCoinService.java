@@ -18,7 +18,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import im.bci.jb3.bouchot.data.Post;
 import im.bci.jb3.bouchot.data.PostRepository;
 import im.bci.jb3.bouchot.logic.UserPostHandler;
-import im.bci.jb3.bouchot.websocket.messages.data.Presence;
 import im.bci.jb3.event.NewPostsEvent;
 
 @Service

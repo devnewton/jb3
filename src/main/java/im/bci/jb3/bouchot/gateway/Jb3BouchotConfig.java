@@ -5,9 +5,11 @@ package im.bci.jb3.bouchot.gateway;
  * @author devnewton
  */
 public class Jb3BouchotConfig {
+
     private String localRoom;
     private String remoteRoom;
     private String webdirectcoinURL;
+    private String url;
 
     public String getLocalRoom() {
         return localRoom;
@@ -25,11 +27,12 @@ public class Jb3BouchotConfig {
         this.remoteRoom = remoteRoom;
     }
 
-    public String getWebdirectcoinURL() {
-        return webdirectcoinURL;
+    public String getUrl() {
+        return url;
     }
 
-    public void setWebdirectcoinURL(String webdirectcoinURL) {
-        this.webdirectcoinURL = webdirectcoinURL;
+    public void setUrl(String url) {
+        this.url = url;
     }
+
 }

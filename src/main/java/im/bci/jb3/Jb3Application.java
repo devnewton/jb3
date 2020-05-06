@@ -5,6 +5,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
+import okhttp3.sse.EventSource;
+import okhttp3.sse.EventSources;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -29,41 +31,46 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 @EnableScheduling
 public class Jb3Application implements CommandLineRunner {
 
-	@Override
-	public void run(String... args) throws Exception {
-		System.out.println("jb3 or not to be!");
-	}
+    @Override
+    public void run(String... args) throws Exception {
+        System.out.println("jb3 or not to be!");
+    }
 
-	@Bean(name = "webdirectcoinExecutor")
-	public ScheduledExecutorService webdirectcoinExecutor() {
-		return Executors.newSingleThreadScheduledExecutor();
-	}
+    @Bean(name = "webdirectcoinExecutor")
+    public ScheduledExecutorService webdirectcoinExecutor() {
+        return Executors.newSingleThreadScheduledExecutor();
+    }
 
-	@Bean(name = "mouleExecutor")
-	public ScheduledExecutorService mouleExecutor() {
-		return Executors.newSingleThreadScheduledExecutor();
-	}
+    @Bean(name = "mouleExecutor")
+    public ScheduledExecutorService mouleExecutor() {
+        return Executors.newSingleThreadScheduledExecutor();
+    }
 
-	@Bean(name = "mouleScheduler")
-	public TaskScheduler mouleScheduler(@Qualifier("mouleExecutor") ScheduledExecutorService executor) {
-		return new ConcurrentTaskScheduler(executor);
-	}
+    @Bean(name = "mouleScheduler")
+    public TaskScheduler mouleScheduler(@Qualifier("mouleExecutor") ScheduledExecutorService executor) {
+        return new ConcurrentTaskScheduler(executor);
+    }
 
-	@Bean
-	public OkHttpClient okHttpClient() {
-		return new OkHttpClient.Builder().pingInterval(10, TimeUnit.SECONDS).build();
+    @Bean
+    public OkHttpClient okHttpClient() {
+        return new OkHttpClient.Builder().pingInterval(10, TimeUnit.SECONDS).build();
+    }
 
-	}
+    @Bean
+    public EventSource.Factory okEventSourceFactory() {
+        OkHttpClient client = new OkHttpClient.Builder().readTimeout(2, TimeUnit.MINUTES).build();
+        return EventSources.createFactory(client);        
+    }
 
-	@Bean
-	FilterRegistrationBean<ForwardedHeaderFilter> forwardedHeaderFilter() {
-		final FilterRegistrationBean<ForwardedHeaderFilter> filterRegistrationBean = new FilterRegistrationBean<ForwardedHeaderFilter>();
-		filterRegistrationBean.setFilter(new ForwardedHeaderFilter());
-		filterRegistrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-		return filterRegistrationBean;
-	}
+    @Bean
+    FilterRegistrationBean<ForwardedHeaderFilter> forwardedHeaderFilter() {
+        final FilterRegistrationBean<ForwardedHeaderFilter> filterRegistrationBean = new FilterRegistrationBean<ForwardedHeaderFilter>();
+        filterRegistrationBean.setFilter(new ForwardedHeaderFilter());
+        filterRegistrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return filterRegistrationBean;
+    }
 
-	public static void main(String[] args) throws Exception {
-		SpringApplication.run(Jb3Application.class, args);
-	}
+    public static void main(String[] args) throws Exception {
+        SpringApplication.run(Jb3Application.class, args);
+    }
 }

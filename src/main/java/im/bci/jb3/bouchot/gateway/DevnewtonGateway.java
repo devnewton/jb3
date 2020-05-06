@@ -9,13 +9,13 @@ import org.springframework.stereotype.Component;
  */
 @ConditionalOnExpression("'${jb3.defaults.room:}' != 'devnewton'")
 @Component
-public class DevnewtonGateway extends AbstractWebdirectcoinGateway {
+public class DevnewtonGateway extends AbstractSSECoinGateway {
     
     private static Jb3BouchotConfig createConf() {
         Jb3BouchotConfig config = new Jb3BouchotConfig();
         config.setLocalRoom("devnewton");
         config.setRemoteRoom("devnewton");
-        config.setWebdirectcoinURL("https://jb3.devnewton.fr/webdirectcoin");
+        config.setUrl("https://jb3.devnewton.fr");
         return config;
     }
 
