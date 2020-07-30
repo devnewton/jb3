@@ -1,7 +1,6 @@
 package im.bci.jb3.coincoin;
 
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
+import java.time.ZonedDateTime;
 
 /**
  *
@@ -9,7 +8,7 @@ import org.joda.time.Interval;
  */
 public class FortuneSearchRQ {
 
-    private int year = DateTime.now().getYear();
+    private int year = ZonedDateTime.now().getYear();
     private String nicknameFilter;
     private String messageFilter;
     private String roomFilter;
@@ -22,16 +21,6 @@ public class FortuneSearchRQ {
 
     public void setYear(int year) {
         this.year = year;
-    }
-
-    public Interval getDateInterval() {
-        try {
-            DateTime start = new DateTime().withYear(year).withMonthOfYear(1).withDayOfMonth(1).withTimeAtStartOfDay();
-            DateTime end = start.plusYears(1);
-            return new Interval(start, end);
-        } catch (Exception e) {
-            return null;
-        }
     }
 
     public int getPageSize() {

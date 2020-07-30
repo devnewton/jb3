@@ -1,11 +1,12 @@
 package im.bci.jb3.bouchot.data;
 
 import java.util.List;
-import org.joda.time.DateTime;
+import java.time.ZonedDateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import im.bci.jb3.bouchot.logic.CleanUtils;
+import java.time.ZoneId;
 
 public class Fortune {
 
@@ -13,7 +14,7 @@ public class Fortune {
     private String id;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private DateTime time = new DateTime();
+    private ZonedDateTime time = ZonedDateTime.now(ZoneId.of("UTC"));
     
     private String fortuner;
     private String title;
@@ -36,11 +37,11 @@ public class Fortune {
         this.posts = posts;
     }
 
-    public DateTime getTime() {
+    public ZonedDateTime getTime() {
         return time;
     }
 
-    public void setTime(DateTime time) {
+    public void setTime(ZonedDateTime time) {
         this.time = time;
     }
     

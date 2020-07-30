@@ -7,6 +7,7 @@ import im.bci.jb3.bouchot.data.PostRevision;
 import im.bci.jb3.bouchot.logic.CleanUtils;
 import im.bci.jb3.event.NewPostsEvent;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +24,9 @@ import okhttp3.sse.EventSources;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.joda.time.DateTime;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.TaskScheduler;
@@ -59,7 +62,7 @@ public abstract class AbstractSSECoinGateway extends EventSourceListener impleme
         scheduler.schedule(() -> {
             Request request = new Request.Builder().url(config.getUrl() + "/ssecoin/posts/stream?rooms=" + config.getRemoteRoom()).build();
             eventSourceFactory.newEventSource(request, this);
-        }, DateTime.now().plusMinutes(nbConnexionFailOrClose).toDate());
+        }, Instant.now().plus(nbConnexionFailOrClose, ChronoUnit.MINUTES));
     }
 
     @Override

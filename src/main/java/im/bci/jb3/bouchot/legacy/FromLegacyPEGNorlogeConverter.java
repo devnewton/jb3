@@ -15,8 +15,7 @@ import org.springframework.stereotype.Component;
 import im.bci.jb3.bouchot.data.Post;
 import im.bci.jb3.bouchot.data.PostRepository;
 import im.bci.jb3.bouchot.logic.Norloge;
-import org.joda.time.DateTime;
-import org.joda.time.MutableDateTime;
+import java.time.ZonedDateTime;
 import org.springframework.context.annotation.Scope;
 
 @Component
@@ -47,24 +46,20 @@ public class FromLegacyPEGNorlogeConverter {
 
         private String room;
 
-        private DateTime postTime;
+        private ZonedDateTime postTime;
 
         public void setRoom(String room) {
             this.room = room;
         }
 
-        public void setPostTime(DateTime postTime) {
+        public void setPostTime(ZonedDateTime postTime) {
             this.postTime = postTime;
         }
 
-        public String convertFullNorloge(int y, int m, int d, int h, int mi, int s, int indice,  String bouchot) {
-            MutableDateTime norlogeTime = new MutableDateTime();
-            norlogeTime.setZone(LegacyUtils.legacyTimeZone);
-            norlogeTime.setRounding(norlogeTime.getChronology().secondOfMinute());
-            norlogeTime.setSecondOfMinute(0);
-            norlogeTime.setDateTime(y, m, d, h, mi, s, 0);
-            Norloge norloge = new Norloge().withTime(norlogeTime.toDateTime()).withHasYear(true).withHasMonth(true).withHasDay(true).withHasSeconds(true).withBouchot(bouchot);
-            Post post = postRepository.findOne(null != norloge.getBouchot() ? norloge.getBouchot() : room, norloge.getTime(), norloge.getTime().plusSeconds(norloge.getPrecisionInSeconds()), indice);
+        public String convertFullNorloge(int y, int m, int d, int h, int mi, int s, int indice, String bouchot) {
+            ZonedDateTime norlogeTime = ZonedDateTime.of(y, m, d, h, mi, s, 0, LegacyUtils.legacyTimeZone);
+            Norloge norloge = new Norloge().withTime(norlogeTime).withBouchot(bouchot);
+            Post post = postRepository.findOne(null != norloge.getBouchot() ? norloge.getBouchot() : room, norlogeTime, norlogeTime.plusSeconds(norloge.getPrecisionInSeconds()), indice);
             if (null != post) {
                 return Norloge.format(post);
             } else {
@@ -75,17 +70,10 @@ public class FromLegacyPEGNorlogeConverter {
         private static final int MAX_YEAR_BEFORE = 2;
 
         public String convertLongNorloge(int m, int d, int h, int mi, int s, int indice, String bouchot) {
-            MutableDateTime norlogeTime = new MutableDateTime();
-            norlogeTime.setZone(LegacyUtils.legacyTimeZone);
-            norlogeTime.setRounding(norlogeTime.getChronology().secondOfMinute());
-            norlogeTime.setYear(postTime.getYear());
-            norlogeTime.setSecondOfMinute(0);
-            norlogeTime.setMonthOfYear(m);
-            norlogeTime.setDayOfMonth(d);
-            norlogeTime.setTime(h, mi, s, 0);
-            Norloge norloge = new Norloge().withTime(norlogeTime.toDateTime()).withHasYear(false).withHasMonth(true).withHasDay(true).withHasSeconds(true).withBouchot(bouchot);
+            ZonedDateTime norlogeTime = ZonedDateTime.of(postTime.getYear(), m, d, h, mi, s, 0, LegacyUtils.legacyTimeZone);
+            Norloge norloge = new Norloge().withTime(norlogeTime).withBouchot(bouchot);
             for (int year = 0; year <= MAX_YEAR_BEFORE; ++year) {
-                DateTime tryTime = norloge.getTime().minusYears(year);
+                ZonedDateTime tryTime = norlogeTime.minusYears(year);
                 Post post = postRepository.findOne(null != norloge.getBouchot() ? norloge.getBouchot() : room, tryTime, tryTime.plusSeconds(norloge.getPrecisionInSeconds()), indice);
                 if (null != post) {
                     return Norloge.format(post);
@@ -97,15 +85,10 @@ public class FromLegacyPEGNorlogeConverter {
         private static final int MAX_DAY_BEFORE = 100;
 
         public String convertNormalNorloge(int h, int mi, int s, int indice, String bouchot) {
-            MutableDateTime norlogeTime = new MutableDateTime();
-            norlogeTime.setZone(LegacyUtils.legacyTimeZone);
-            norlogeTime.setRounding(norlogeTime.getChronology().secondOfMinute());
-            norlogeTime.setDate(postTime);
-            norlogeTime.setSecondOfMinute(0);
-            norlogeTime.setTime(h, mi, s, 0);
-            Norloge norloge = new Norloge().withTime(norlogeTime.toDateTime()).withHasYear(false).withHasMonth(false).withHasDay(false).withHasSeconds(true).withBouchot(bouchot);
+            ZonedDateTime norlogeTime = ZonedDateTime.of(postTime.getYear(), postTime.getMonthValue(), postTime.getDayOfMonth(), h, mi, s, 0, LegacyUtils.legacyTimeZone);
+            Norloge norloge = new Norloge().withTime(norlogeTime).withBouchot(bouchot);
             for (int day = 0; day <= MAX_DAY_BEFORE; ++day) {
-                DateTime tryTime = norloge.getTime().minusDays(day);
+                ZonedDateTime tryTime = norlogeTime.minusDays(day);
                 Post post = postRepository.findOne(null != norloge.getBouchot() ? norloge.getBouchot() : room, tryTime, tryTime.plusSeconds(norloge.getPrecisionInSeconds()), indice);
                 if (null != post) {
                     return Norloge.format(post);
@@ -115,14 +98,10 @@ public class FromLegacyPEGNorlogeConverter {
         }
 
         public String convertShortNorloge(int h, int mi, int indice, String bouchot) {
-            MutableDateTime norlogeTime = new MutableDateTime();
-            norlogeTime.setZone(LegacyUtils.legacyTimeZone);
-            norlogeTime.setRounding(norlogeTime.getChronology().secondOfMinute());
-            norlogeTime.setDate(postTime);
-            norlogeTime.setTime(h, mi, 0, 0);
-            Norloge norloge = new Norloge().withTime(norlogeTime.toDateTime()).withHasYear(false).withHasMonth(false).withHasDay(false).withHasSeconds(false).withBouchot(bouchot);
+            ZonedDateTime norlogeTime = ZonedDateTime.of(postTime.getYear(), postTime.getMonthValue(), postTime.getDayOfMonth(), h, mi, 0, 0, LegacyUtils.legacyTimeZone);
+            Norloge norloge = new Norloge().withTime(norlogeTime).withBouchot(bouchot);
             for (int day = 0; day <= MAX_DAY_BEFORE; ++day) {
-                DateTime tryTime = norloge.getTime().minusDays(day);
+                ZonedDateTime tryTime = norlogeTime.minusDays(day);
                 Post post = postRepository.findOne(null != norloge.getBouchot() ? norloge.getBouchot() : room, tryTime, tryTime.plusSeconds(norloge.getPrecisionInSeconds()), indice);
                 if (null != post) {
                     return Norloge.format(post);
@@ -159,7 +138,7 @@ public class FromLegacyPEGNorlogeConverter {
         }
     }
 
-    public String convertFromLegacyNorloge(String message, DateTime postTime, String room) {
+    public String convertFromLegacyNorloge(String message, ZonedDateTime postTime, String room) {
         try {
             ParseOptions options = new ParseOptions();
             NorlogeConverter converter = new NorlogeConverter();

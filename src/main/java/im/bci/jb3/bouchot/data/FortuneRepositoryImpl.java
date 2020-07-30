@@ -2,7 +2,6 @@ package im.bci.jb3.bouchot.data;
 
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.Interval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -12,6 +11,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import im.bci.jb3.coincoin.FortuneSearchRQ;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Date;
 
 /**
  *
@@ -39,10 +41,9 @@ public class FortuneRepositoryImpl implements FortuneRepository {
     @Override
     public List<Fortune> search(FortuneSearchRQ rq) {
         Query query = new Query();
-        Interval interval = rq.getDateInterval();
-        if(null != interval) {
-        	query = query.addCriteria(Criteria.where("time").gte(interval.getStart().toDate()).lt(interval.getEnd().toDate()));
-        }
+        ZonedDateTime startTime = ZonedDateTime.of(rq.getYear(), 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"));
+        ZonedDateTime endTime = startTime.plusYears(1);
+        query = query.addCriteria(Criteria.where("time").gte(startTime.toInstant()).lt(endTime.toInstant()));
         if (StringUtils.isNotBlank(rq.getMessageFilter())) {
             query = query.addCriteria(Criteria.where("posts").elemMatch(Criteria.where("message").regex(rq.getMessageFilter())));
         }

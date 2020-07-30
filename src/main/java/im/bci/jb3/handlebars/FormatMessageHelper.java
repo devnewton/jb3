@@ -19,6 +19,7 @@ import com.github.jknack.handlebars.Options;
 import im.bci.jb3.bouchot.data.Post;
 import im.bci.jb3.bouchot.data.PostRepository;
 import im.bci.jb3.bouchot.logic.Norloge;
+import java.time.ZonedDateTime;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.annotation.Scope;
 
@@ -39,7 +40,7 @@ public class FormatMessageHelper implements Helper<Post> {
     public static class NorlogeFormatter {
 
         public String format(Post post) {
-            return Norloge.norlogePrintFormatter.print(post.getTime());
+            return Norloge.norlogePrintFormatter.format(post.getTime());
         }
     }
 

@@ -1,11 +1,12 @@
 package im.bci.jb3.coincoin;
 
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import java.time.ZonedDateTime;
 
 import im.bci.jb3.bouchot.legacy.LegacyUtils;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoUnit;
 
 /**
  *
@@ -13,9 +14,9 @@ import im.bci.jb3.bouchot.legacy.LegacyUtils;
  */
 public class PostSearchRQ {
 
-    public static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss").withZone(LegacyUtils.legacyTimeZone);
-    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd").withZone(LegacyUtils.legacyTimeZone);
-    public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern("HH:mm:ss").withZone(LegacyUtils.legacyTimeZone);
+    public static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss").withZone(LegacyUtils.legacyTimeZone);
+    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(LegacyUtils.legacyTimeZone);
+    public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss").withZone(LegacyUtils.legacyTimeZone);
 
     private String since, sinceTime;
     private String until, untilTime;
@@ -73,24 +74,24 @@ public class PostSearchRQ {
         this.untilTime = untilTime;
     }
 
-    public DateTime getSinceDate() {
+    public ZonedDateTime getSinceDate() {
         try {
             if (StringUtils.isNotBlank(sinceTime)) {
-                return DATETIME_FORMATTER.parseDateTime(since + "T" + sinceTime);
+                return ZonedDateTime.parse(since + "T" + sinceTime, DATETIME_FORMATTER);
             } else {
-                return DATE_FORMATTER.parseDateTime(since).withTimeAtStartOfDay();
+                return ZonedDateTime.parse(since, DATETIME_FORMATTER).truncatedTo(ChronoUnit.DAYS);
             }
         } catch (Exception e) {
             return null;
         }
     }
 
-    public DateTime getUntilDate() {
+    public ZonedDateTime getUntilDate() {
         try {
             if (StringUtils.isNotBlank(untilTime)) {
-                return DATETIME_FORMATTER.parseDateTime(until + "T" + untilTime);
+                return ZonedDateTime.parse(until + "T" + untilTime, DATETIME_FORMATTER);
             } else {
-                return DATE_FORMATTER.parseDateTime(until).millisOfDay().withMaximumValue();
+                return ZonedDateTime.parse(until, DATE_FORMATTER).plusDays(1).minusNanos(1);
             }
         } catch (Exception e) {
             return null;

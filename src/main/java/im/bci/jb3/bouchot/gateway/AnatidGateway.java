@@ -28,7 +28,7 @@ import javax.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.joda.time.DateTime;
+import java.time.ZonedDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +38,9 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Instant;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 
 /**
  *
@@ -90,7 +93,7 @@ public class AnatidGateway extends WebSocketListener implements Gateway {
 		scheduler.schedule(() -> {
 			Request request = new Request.Builder().url(pollUrl).build();
 			httpClient.newWebSocket(request, this);
-		}, DateTime.now().plusMinutes(nbConnexionFailOrClose).toDate());
+		}, Instant.now().plus(nbConnexionFailOrClose, ChronoUnit.MINUTES));
 	}
 
 	@Override
@@ -135,11 +138,10 @@ public class AnatidGateway extends WebSocketListener implements Gateway {
 				Post post = new Post();
 				post.setGatewayPostId(gatewayPostId);
 				post.setRoom(legacyPost.getTribune());
-				DateTime postTimeRounded = LegacyUtils.legacyPostTimeFormatter.parseDateTime(legacyPost.getTime())
-						.secondOfMinute().roundFloorCopy();
+				ZonedDateTime postTimeRounded = ZonedDateTime.parse(legacyPost.getTime(),LegacyUtils.legacyPostTimeFormatter).truncatedTo(ChronoUnit.SECONDS);
 				long nbPostsAtSameSecond = postPepository.countPosts(postTimeRounded, postTimeRounded.plusSeconds(1),
 						legacyPost.getTribune());
-				post.setTime(postTimeRounded.withMillisOfSecond((int) nbPostsAtSameSecond));
+				post.setTime(postTimeRounded.with(ChronoField.MILLI_OF_SECOND, nbPostsAtSameSecond));
 				String nickname = CleanUtils.truncateNickname(legacyPost.getLogin());
 				if (StringUtils.isBlank(nickname)) {
 					nickname = CleanUtils.truncateNickname(legacyPost.getInfo());
@@ -162,8 +164,7 @@ public class AnatidGateway extends WebSocketListener implements Gateway {
 			try {
 				if (null != postUrl) {
 					okhttp3.FormBody.Builder body = new FormBody.Builder().add("message",
-							legacyUtils.convertToLegacyNorloges(message, DateTime.now()
-									.withZone(LegacyUtils.legacyTimeZone).secondOfMinute().roundFloorCopy(), room))
+							legacyUtils.convertToLegacyNorloges(message, ZonedDateTime.now(LegacyUtils.legacyTimeZone).truncatedTo(ChronoUnit.SECONDS), room))
 							.add("tribune", room);
 					if (StringUtils.isNotBlank(auth)) {
 						body.add("auth", auth);

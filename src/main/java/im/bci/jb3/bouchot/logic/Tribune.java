@@ -14,8 +14,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import java.time.ZonedDateTime;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.util.concurrent.RateLimiter;
 import im.bci.jb3.event.NewPostsEvent;
+import java.time.ZoneId;
 import java.util.concurrent.TimeUnit;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -51,7 +51,7 @@ public class Tribune {
                 post.setNickname(StringUtils.isNotBlank(nickname) ? nickname : "AnonymousCoward");
                 post.setMessage(message);
                 post.setRoom(room);
-                post.setTime(DateTime.now(DateTimeZone.UTC));
+                post.setTime(ZonedDateTime.now(ZoneId.of("UTC")));
                 postPepository.save(post);
                 publisher.publishEvent(new NewPostsEvent(post));
                 return post;
@@ -132,8 +132,8 @@ public class Tribune {
                     return Arrays.asList(post);
                 }
             } else if (null != norloge.getTime()) {
-                DateTime start = norloge.getTime();
-                DateTime end = norloge.getTime().plusSeconds(1);
+                ZonedDateTime start = norloge.toZonedDateTime();
+                ZonedDateTime end = start.plusSeconds(1);
                 return postPepository.findPosts(start, end, null);
             }
         }

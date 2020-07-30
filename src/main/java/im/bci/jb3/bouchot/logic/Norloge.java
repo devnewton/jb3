@@ -2,23 +2,21 @@ package im.bci.jb3.bouchot.logic;
 
 import im.bci.jb3.bouchot.data.Post;
 import im.bci.jb3.bouchot.legacy.LegacyUtils;
+import java.time.ZonedDateTime;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.MutableDateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
 
 public class Norloge {
 
     private String id;
-    private DateTime time;
+    private TemporalAccessor time;
     private String bouchot;
-    private boolean hasYear, hasMonth, hasDay, hasSeconds;
 
     public Norloge(Post post) {
         this.id = post.getId();
@@ -40,21 +38,30 @@ public class Norloge {
         return this;
     }
 
-    public DateTime getTime() {
+    public TemporalAccessor getTime() {
         return time;
     }
 
-    public void setTime(DateTime time) {
+    ZonedDateTime toZonedDateTime() {
+        if(null == time) {
+            return null;
+        }
+        ZonedDateTime now = ZonedDateTime.now(LegacyUtils.legacyTimeZone);
+        int year = time.isSupported(ChronoField.YEAR) ? time.get(ChronoField.YEAR) : now.getYear();
+        int month = time.isSupported(ChronoField.MONTH_OF_YEAR) ? time.get(ChronoField.MONTH_OF_YEAR) : now.getMonthValue();
+        int day = time.isSupported(ChronoField.DAY_OF_MONTH) ? time.get(ChronoField.DAY_OF_MONTH) : now.getDayOfMonth();
+        int hour = time.get(ChronoField.HOUR_OF_DAY);
+        int minutes = time.get(ChronoField.MINUTE_OF_HOUR);
+        int seconds = time.isSupported(ChronoField.SECOND_OF_MINUTE) ? time.get(ChronoField.SECOND_OF_MINUTE) : 0;
+        return ZonedDateTime.of(year, month, day, hour, minutes, seconds, 0, LegacyUtils.legacyTimeZone);
+    }
+
+    public void setTime(TemporalAccessor time) {
         this.time = time;
     }
 
-    public Norloge withTime(DateTime t) {
+    public Norloge withTime(TemporalAccessor t) {
         setTime(t);
-        return this;
-    }
-
-    public Norloge withTime(Date t) {
-        setTime(new DateTime(t));
         return this;
     }
 
@@ -72,62 +79,27 @@ public class Norloge {
     }
 
     public boolean getHasYear() {
-        return hasYear;
-    }
-
-    public void setHasYear(boolean hasYear) {
-        this.hasYear = hasYear;
-    }
-
-    public Norloge withHasYear(boolean hasYear) {
-        setHasYear(hasYear);
-        return this;
+        return time.isSupported(ChronoField.YEAR);
     }
 
     public boolean getHasMonth() {
-        return hasMonth;
-    }
-
-    public void setHasMonth(boolean hasMonth) {
-        this.hasMonth = hasMonth;
-    }
-
-    public Norloge withHasMonth(boolean hasMonth) {
-        setHasMonth(hasMonth);
-        return this;
+        return time.isSupported(ChronoField.MONTH_OF_YEAR);
     }
 
     public boolean getHasDay() {
-        return hasDay;
-    }
-
-    public void setHasDay(boolean hasDay) {
-        this.hasDay = hasDay;
-    }
-
-    public Norloge withHasDay(boolean hasDay) {
-        setHasDay(hasDay);
-        return this;
+        return time.isSupported(ChronoField.DAY_OF_MONTH);
     }
 
     public boolean getHasSeconds() {
-        return hasSeconds;
-    }
-
-    public void setHasSeconds(boolean hasSeconds) {
-        this.hasSeconds = hasSeconds;
-    }
-
-    public Norloge withHasSeconds(boolean hasSeconds) {
-        setHasSeconds(hasSeconds);
-        return this;
+        return time.isSupported(ChronoField.SECOND_OF_MINUTE);
     }
 
     @Override
     public int hashCode() {
         int hash = 3;
         hash = 67 * hash + (this.id != null ? this.id.hashCode() : 0);
-        hash = 67 * hash + (this.time != null ? this.time.hashCode() : 0);
+        ZonedDateTime dateTime = toZonedDateTime();
+        hash = 67 * hash + (dateTime != null ? dateTime.hashCode() : 0);
         hash = 67 * hash + (this.bouchot != null ? this.bouchot.hashCode() : 0);
         return hash;
     }
@@ -144,24 +116,31 @@ public class Norloge {
         if ((this.id == null) ? (other.id != null) : !this.id.equals(other.id)) {
             return false;
         }
-        if (this.time != other.time && (this.time == null || !this.time.equals(other.time))) {
+        
+        if((this.bouchot == null) ? (other.bouchot != null) : !this.bouchot.equals(other.bouchot)) {
             return false;
         }
-        return !((this.bouchot == null) ? (other.bouchot != null) : !this.bouchot.equals(other.bouchot));
+        
+        ZonedDateTime thisDateTime = toZonedDateTime();
+        ZonedDateTime otherDateTime = other.toZonedDateTime();
+        return thisDateTime == null ? otherDateTime == null : thisDateTime.equals(otherDateTime);
+        
     }
+    
+    
 
-    public static final DateTimeFormatter norlogePrintFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss").withZone(LegacyUtils.legacyTimeZone);
-    private static final DateTimeFormatter norlogeParseFullIsoFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss").withZone(LegacyUtils.legacyTimeZone);
-    private static final DateTimeFormatter norlogeParseFullFormatter = DateTimeFormat.forPattern("yyyy/MM/dd#HH:mm:ss").withZone(LegacyUtils.legacyTimeZone);
-    private static final DateTimeFormatter norlogeParseLongFormatter = DateTimeFormat.forPattern("MM/dd#HH:mm:ss").withZone(LegacyUtils.legacyTimeZone);
-    private static final DateTimeFormatter norlogeParseNormalFormatter = DateTimeFormat.forPattern("HH:mm:ss").withZone(LegacyUtils.legacyTimeZone);
-    private static final DateTimeFormatter norlogeParseShortFormatter = DateTimeFormat.forPattern("HH:mm").withZone(LegacyUtils.legacyTimeZone);
+    public static final DateTimeFormatter norlogePrintFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss").withZone(LegacyUtils.legacyTimeZone);
+    private static final DateTimeFormatter norlogeParseFullIsoFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss").withZone(LegacyUtils.legacyTimeZone);
+    private static final DateTimeFormatter norlogeParseFullFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd'#'HH:mm:ss").withZone(LegacyUtils.legacyTimeZone);
+    private static final DateTimeFormatter norlogeParseLongFormatter = DateTimeFormatter.ofPattern("MM/dd'#'HH:mm:ss").withZone(LegacyUtils.legacyTimeZone);
+    private static final DateTimeFormatter norlogeParseNormalFormatter = DateTimeFormatter.ofPattern("HH:mm:ss").withZone(LegacyUtils.legacyTimeZone);
+    private static final DateTimeFormatter norlogeParseShortFormatter = DateTimeFormatter.ofPattern("HH:mm").withZone(LegacyUtils.legacyTimeZone);
     private static final Pattern norlogesPattern = Pattern.compile("((#(?<id>\\w+))|(?<time>(?<date>((?<year>\\d\\d\\d\\d)[/-])?(?:1[0-2]|0[1-9])[/-](?:3[0-1]|[1-2][0-9]|0[1-9])[#T])?((?:2[0-3]|[0-1][0-9])):([0-5][0-9])(:(?<seconds>[0-5][0-9]))?)(?<exp>[¹²³]|[:\\^][1-9]|[:\\^][1-9][0-9])?)(@(?<bouchot>[\\w.]+))?");
 
     public static class ParsedNorloges extends ArrayList<Norloge> {
 
         private static final long serialVersionUID = 1L;
-        
+
         private String remainingMessageContent;
 
         public String getRemainingMessageContent() {
@@ -172,7 +151,7 @@ public class Norloge {
             this.remainingMessageContent = remainingMessageContent;
         }
     }
-    
+
     public static ParsedNorloges parseNorloges(String message) {
         final ParsedNorloges result = new ParsedNorloges();
         final StringBuffer sb = new StringBuffer();
@@ -195,7 +174,7 @@ public class Norloge {
     }
 
     public int getPrecisionInSeconds() {
-        return hasSeconds ? 1 : 60;
+        return getHasSeconds() ? 1 : 60;
     }
 
     public interface NorlogeProcessor {
@@ -230,21 +209,21 @@ public class Norloge {
     }
 
     private static Norloge parseNorlogeTime(String item) {
-        DateTime norlogeTime = parseNorlogeTimeWithFormat(item, norlogeParseFullIsoFormatter);
+        TemporalAccessor norlogeTime = parseNorlogeTimeWithFormat(item, norlogeParseFullIsoFormatter);
         if (null != norlogeTime) {
-            return new Norloge().withTime(norlogeTime).withHasYear(true).withHasMonth(true).withHasDay(true).withHasSeconds(true);
+            return new Norloge().withTime(norlogeTime);
         }
         norlogeTime = parseNorlogeTimeWithFormat(item, norlogeParseFullFormatter);
         if (null != norlogeTime) {
-            return new Norloge().withTime(norlogeTime).withHasYear(true).withHasMonth(true).withHasDay(true).withHasSeconds(true);
+            return new Norloge().withTime(norlogeTime);
         }
         norlogeTime = parseNorlogeTimeWithFormat(item, norlogeParseLongFormatter);
         if (null != norlogeTime) {
-            return new Norloge().withTime(norlogeTime).withHasMonth(true).withHasDay(true).withHasSeconds(true);
+            return new Norloge().withTime(norlogeTime);
         }
         norlogeTime = parseNorlogeTimeWithFormat(item, norlogeParseNormalFormatter);
         if (null != norlogeTime) {
-            return new Norloge().withTime(norlogeTime).withHasSeconds(true);
+            return new Norloge().withTime(norlogeTime);
         }
         norlogeTime = parseNorlogeTimeWithFormat(item, norlogeParseShortFormatter);
         if (null != norlogeTime) {
@@ -253,17 +232,9 @@ public class Norloge {
         return null;
     }
 
-    private static DateTime parseNorlogeTimeWithFormat(String item, DateTimeFormatter format) {
+    private static TemporalAccessor parseNorlogeTimeWithFormat(String item, DateTimeFormatter format) {
         try {
-            MutableDateTime norlogeTime = new MutableDateTime();
-            norlogeTime.setZone(format.getZone());
-            norlogeTime.setRounding(norlogeTime.getChronology().secondOfMinute());
-            norlogeTime.setSecondOfMinute(0);
-            if (format.parseInto(norlogeTime, item, 0) >= 0) {
-                return norlogeTime.toDateTime();
-            } else {
-                return null;
-            }
+            return format.parse(item);
         } catch (Exception e) {
             return null;
         }
@@ -281,7 +252,7 @@ public class Norloge {
             sb.append(id);
         }
         if (null != time) {
-            sb.append(norlogePrintFormatter.print(time));
+            sb.append(norlogePrintFormatter.format(toZonedDateTime()));
         }
         if (StringUtils.isNotBlank(bouchot)) {
             sb.append('@').append(bouchot);

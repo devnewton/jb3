@@ -3,10 +3,7 @@ package im.bci.jb3.sse;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Period;
-import org.joda.time.format.ISOPeriodFormat;
+import java.time.ZonedDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
@@ -19,6 +16,8 @@ import im.bci.jb3.bouchot.data.Post;
 import im.bci.jb3.bouchot.data.PostRepository;
 import im.bci.jb3.bouchot.logic.UserPostHandler;
 import im.bci.jb3.event.NewPostsEvent;
+import java.time.Period;
+import java.time.ZoneId;
 
 @Service
 public class SseCoinService {
@@ -34,7 +33,7 @@ public class SseCoinService {
 
     @Value("${jb3.posts.get.period}")
     public void setPostsGetPeriod(String p) {
-        postsGetPeriod = ISOPeriodFormat.standard().parsePeriod(p);
+        postsGetPeriod = Period.parse(p);
     }
 
     public SseMoule addMoule(String[] rooms) {
@@ -46,8 +45,8 @@ public class SseCoinService {
 
     @Async
     public void emitPosts(SseMoule moule) {
-        DateTime end = DateTime.now(DateTimeZone.UTC).plusHours(1);
-        DateTime start = end.minus(postsGetPeriod);
+        ZonedDateTime end = ZonedDateTime.now(ZoneId.of("UTC")).plusHours(1);
+        ZonedDateTime start = end.minus(postsGetPeriod);
         for (String room : moule.rooms) {
             List<Post> posts = postRepository.findPosts(start, end, room);
             try {

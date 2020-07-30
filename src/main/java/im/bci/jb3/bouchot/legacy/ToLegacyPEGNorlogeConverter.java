@@ -15,10 +15,9 @@ import im.bci.jb3.bouchot.data.Post;
 import im.bci.jb3.bouchot.data.PostRepository;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeComparator;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import org.springframework.context.annotation.Scope;
 
 @Component
@@ -44,21 +43,20 @@ public class ToLegacyPEGNorlogeConverter {
             throw new RuntimeException(e);
         }
     }
-    private static final DateTimeFormatter TO_ISO_NORLOGE_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss").withZone(LegacyUtils.legacyTimeZone);
-    private static final DateTimeFormatter TO_NORMAL_NORLOGE_FORMATTER = DateTimeFormat.forPattern("HH:mm:ss").withZone(LegacyUtils.legacyTimeZone);
-    private static final DateTimeComparator DATE_COMPARATOR = DateTimeComparator.getDateOnlyInstance();
+    private static final DateTimeFormatter TO_ISO_NORLOGE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss").withZone(LegacyUtils.legacyTimeZone);
+    private static final DateTimeFormatter TO_NORMAL_NORLOGE_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss").withZone(LegacyUtils.legacyTimeZone);
 
     public class NorlogeConverter {
 
         private String room;
 
-        private DateTime postTime;
+        private ZonedDateTime postTime;
 
         public void setRoom(String room) {
             this.room = room;
         }
 
-        public void setPostTime(DateTime postTime) {
+        public void setPostTime(ZonedDateTime postTime) {
             this.postTime = postTime;
         }
 
@@ -66,10 +64,10 @@ public class ToLegacyPEGNorlogeConverter {
             Post post = postRepository.findOne(id);
             if (null != post) {
                 StringBuilder legacyNorloge = new StringBuilder();
-                if (DATE_COMPARATOR.compare(post.getTime(), postTime) == 0) {
-                    legacyNorloge.append(TO_NORMAL_NORLOGE_FORMATTER.print(post.getTime()));
+                if (postTime.truncatedTo(ChronoUnit.DAYS).compareTo(post.getTime().truncatedTo(ChronoUnit.DAYS)) == 0) {
+                    legacyNorloge.append(TO_NORMAL_NORLOGE_FORMATTER.format(post.getTime()));
                 } else {
-                    legacyNorloge.append(TO_ISO_NORLOGE_FORMATTER.print(post.getTime()));
+                    legacyNorloge.append(TO_ISO_NORLOGE_FORMATTER.format(post.getTime()));
                 }
                 addIndice(post, legacyNorloge);
                 if (!StringUtils.equals(post.getRoom(), room)) {
@@ -81,7 +79,7 @@ public class ToLegacyPEGNorlogeConverter {
         }
 
         private void addIndice(Post post, StringBuilder legacyNorloge) {
-            DateTime postTimeRounded = post.getTime().secondOfMinute().roundFloorCopy();
+            ZonedDateTime postTimeRounded = post.getTime().truncatedTo(ChronoUnit.SECONDS);
             List<Post> siblings = postRepository.findPostsReverse(postTimeRounded, postTimeRounded.plusSeconds(1), room);
             if (siblings.size() > 1) {
                 int indice = 1;
@@ -139,7 +137,7 @@ public class ToLegacyPEGNorlogeConverter {
         }
     }
 
-    public String convertToLegacyNorloges(String message, DateTime postTime, String room) {
+    public String convertToLegacyNorloges(String message, ZonedDateTime postTime, String room) {
         try {
             ParseOptions options = new ParseOptions();
             NorlogeConverter converter = new NorlogeConverter();

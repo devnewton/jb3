@@ -12,7 +12,7 @@ import im.bci.jb3.coincoin.PostSearchRQ;
 import im.bci.jb3.coincoin.PostSearchResultMV;
 import javax.servlet.http.HttpServletRequest;
 
-import org.joda.time.DateTime;
+import java.time.ZonedDateTime;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -37,13 +37,13 @@ public class ArchivesController {
 		Post post = postRepository.findOne(postId);
 		UriComponentsBuilder uri = ServletUriComponentsBuilder.fromRequest(request).replacePath("/archives");
 		if (null != post) {
-			DateTime time = post.getTime();
-			DateTime since = time.minusHours(1);
-			DateTime until = time.plusHours(1);
-			uri.queryParam("roomFilter", post.getCleanedRoom()).queryParam("since", PostSearchRQ.DATE_FORMATTER.print(since))
-					.queryParam("sinceTime", PostSearchRQ.TIME_FORMATTER.print(since))
-					.queryParam("until", PostSearchRQ.DATE_FORMATTER.print(until))
-					.queryParam("untilTime", PostSearchRQ.TIME_FORMATTER.print(until)).fragment(postId);
+			ZonedDateTime time = post.getTime();
+			ZonedDateTime since = time.minusHours(1);
+			ZonedDateTime until = time.plusHours(1);
+			uri.queryParam("roomFilter", post.getCleanedRoom()).queryParam("since", PostSearchRQ.DATE_FORMATTER.format(since))
+					.queryParam("sinceTime", PostSearchRQ.TIME_FORMATTER.format(since))
+					.queryParam("until", PostSearchRQ.DATE_FORMATTER.format(until))
+					.queryParam("untilTime", PostSearchRQ.TIME_FORMATTER.format(until)).fragment(postId);
 		}
 		return "redirect:" + uri.build().encode().toString();
 	}

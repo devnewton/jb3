@@ -3,7 +3,7 @@ package im.bci.jb3.bouchot.data;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
+import java.time.ZonedDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -34,8 +34,8 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public List<Post> findPosts(DateTime start, DateTime end, String room) {
-        Criteria criteria = Criteria.where("time").gte(start.toDate()).lt(end.toDate()).and("room")
+    public List<Post> findPosts(ZonedDateTime start, ZonedDateTime end, String room) {
+        Criteria criteria = Criteria.where("time").gte(start.toInstant()).lt(end.toInstant()).and("room")
                 .is(roomOrDefault(room));
         Query query = new Query().addCriteria(criteria)
                 .with(PageRequest.of(0, roomHistorySize, Sort.Direction.DESC, "time", "gatewayPostId.postId"));
@@ -44,8 +44,8 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public List<Post> findPostsReverse(DateTime start, DateTime end, String room) {
-        Criteria criteria = Criteria.where("time").gte(start.toDate()).lt(end.toDate()).and("room")
+    public List<Post> findPostsReverse(ZonedDateTime start, ZonedDateTime end, String room) {
+        Criteria criteria = Criteria.where("time").gte(start.toInstant()).lt(end.toInstant()).and("room")
                 .is(roomOrDefault(room));
         Query query = new Query().addCriteria(criteria)
                 .with(PageRequest.of(0, roomHistorySize, Sort.Direction.ASC, "time", "gatewayPostId.postId"));
@@ -54,8 +54,8 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public long countPosts(DateTime start, DateTime end, String room) {
-        Criteria criteria = Criteria.where("time").gte(start.toDate()).lt(end.toDate()).and("room")
+    public long countPosts(ZonedDateTime start, ZonedDateTime end, String room) {
+        Criteria criteria = Criteria.where("time").gte(start.toInstant()).lt(end.toInstant()).and("room")
                 .is(roomOrDefault(room));
         Query query = new Query().addCriteria(criteria)
                 .with(PageRequest.of(0, roomHistorySize, Sort.Direction.ASC, "time", "gatewayPostId.postId"));
@@ -82,8 +82,8 @@ public class PostRepositoryImpl implements PostRepository {
     private static final String COLLECTION_NAME = "post";
 
     @Override
-    public Post findOne(String room, DateTime start, DateTime end, int indice) {
-        Criteria criteria = Criteria.where("time").gte(start.toDate()).lt(end.toDate()).and("room")
+    public Post findOne(String room, ZonedDateTime start, ZonedDateTime end, int indice) {
+        Criteria criteria = Criteria.where("time").gte(start.toInstant()).lt(end.toInstant()).and("room")
                 .is(roomOrDefault(room));
         Query query = new Query().addCriteria(criteria)
                 .with(PageRequest.of(0, 9, Sort.Direction.ASC, "time", "gatewayPostId.postId"));
@@ -123,18 +123,18 @@ public class PostRepositoryImpl implements PostRepository {
             query = query.addCriteria(Criteria.where("room").is(rq.getRoomFilter()));
             ++nbCriteria;
         }
-        DateTime sinceDate = rq.getSinceDate();
-        DateTime untilDate = rq.getUntilDate();
+        ZonedDateTime sinceDate = rq.getSinceDate();
+        ZonedDateTime untilDate = rq.getUntilDate();
         if (null != sinceDate && null != untilDate) {
-            query.addCriteria(Criteria.where("time").gte(sinceDate.toDate()).lte(untilDate.toDate()));
+            query.addCriteria(Criteria.where("time").gte(sinceDate.toInstant()).lte(untilDate.toInstant()));
             ++nbCriteria;
         } else {
             if (null != sinceDate) {
-                query.addCriteria(Criteria.where("time").gte(sinceDate.toDate()));
+                query.addCriteria(Criteria.where("time").gte(sinceDate.toInstant()));
                 ++nbCriteria;
             }
             if (null != untilDate) {
-                query.addCriteria(Criteria.where("time").lte(untilDate.toDate()));
+                query.addCriteria(Criteria.where("time").lte(untilDate.toInstant()));
                 ++nbCriteria;
             }
         }

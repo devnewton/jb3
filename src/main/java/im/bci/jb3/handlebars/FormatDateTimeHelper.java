@@ -8,9 +8,8 @@ import im.bci.jb3.bouchot.legacy.LegacyUtils;
 
 import java.io.IOException;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import org.springframework.stereotype.Component;
 
 /**
@@ -18,13 +17,13 @@ import org.springframework.stereotype.Component;
  * @author devnewton
  */
 @Component
-public class FormatDateTimeHelper implements Helper<DateTime> {
+public class FormatDateTimeHelper implements Helper<ZonedDateTime> {
 
-    private static final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").withZone(LegacyUtils.legacyTimeZone);
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(LegacyUtils.legacyTimeZone);
 
     @Override
-    public CharSequence apply(DateTime dateTime, Options options) throws IOException {
-        return new Handlebars.SafeString(formatter.print(dateTime));
+    public CharSequence apply(ZonedDateTime dateTime, Options options) throws IOException {
+        return new Handlebars.SafeString(formatter.format(dateTime));
     }
 
 }
