@@ -32,7 +32,7 @@ class Jb3 {
         let roomInDomain = uri.domain().slice(0, -uri.tld().length - 1);
         roomInDomain = this.rooms[roomInDomain] && roomInDomain;
         this.controlsRoom.attr("size", Math.min(this.controlsRoom.find('option').length, 10));
-        this.controlsRoom.val(roomInURI || roomInDomain || localStorage.selectedRoom || this.controlsRoom.find('option:first').val());
+        this.controlsRoom.val(roomInURI || roomInDomain || localStorage.selectedRoom || this.controlsRoom.find('option').first().val());
         this.controlsMessage.attr("placeholder", this.controlsRoom.val());
         let postsContainer = document.getElementById('jb3-posts-container');
         for (let room in this.rooms) {

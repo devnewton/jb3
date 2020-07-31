@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <groups xmlns="http://www.isdc.ro/wro">
 	<group name="archives">
-		<js>classpath:META-INF/resources/webjars/jquery/3.0.0/jquery.js</js>
+		<js>classpath:META-INF/resources/webjars/jquery/3.5.1/jquery.js</js>
 		<js>/assets/common/common.js</js>
 		<js>/assets/common/post-to-html.js</js>
 		<js>/assets/archives/archives.js</js>
@@ -12,7 +12,7 @@
 		<css>/assets/archives/archives.css</css>
 	</group>
 	<group name="coincoin">
-		<js>classpath:META-INF/resources/webjars/jquery/3.0.0/jquery.js</js>
+		<js>classpath:META-INF/resources/webjars/jquery/3.5.1/jquery.js</js>
 		<js>classpath:META-INF/resources/webjars/handlebars/4.7.6/dist/handlebars.js
 		</js>
 		<js>classpath:META-INF/resources/webjars/URI.js/1.14.1/URI.js</js>
@@ -50,7 +50,7 @@
 		<css>/assets/common/reset.css</css>
 	</group>
 	<group name="fortunes">
-		<js>classpath:META-INF/resources/webjars/jquery/3.0.0/jquery.js</js>
+		<js>classpath:META-INF/resources/webjars/jquery/3.5.1/jquery.js</js>
 		<js>/assets/common/post-to-html.js</js>
 		<js>/assets/fortunes/fortunes.js</js>
 		<css>classpath:META-INF/resources/webjars/blaze/3.2.0/dist/blaze.min.css
@@ -60,7 +60,7 @@
 		<css>/assets/fortunes/fortunes.css</css>
 	</group>
 	<group name="paste">
-		<js>classpath:META-INF/resources/webjars/jquery/3.0.0/jquery.js</js>
+		<js>classpath:META-INF/resources/webjars/jquery/3.5.1/jquery.js</js>
 		<js>classpath:META-INF/resources/webjars/riot/2.4.1/riot.js</js>
 		<js>/assets/thirdparty/responsive-sketchpad.js</js>
                 <js>/assets/tags/paste/jb3-paste-emoji--tag.js</js>
@@ -76,7 +76,7 @@
 		</css>
 	</group>
 	<group name="rooms">
-		<js>classpath:META-INF/resources/webjars/jquery/3.0.0/jquery.js</js>
+		<js>classpath:META-INF/resources/webjars/jquery/3.5.1/jquery.js</js>
 		<js>classpath:META-INF/resources/webjars/riot/2.4.1/riot.js</js>
 		<js>/assets/common/common.js</js>
 		<js>/assets/tags/jb3-rooms-list--tag.js</js>
