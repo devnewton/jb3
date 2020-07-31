@@ -13,10 +13,10 @@
 	</group>
 	<group name="coincoin">
 		<js>classpath:META-INF/resources/webjars/jquery/3.0.0/jquery.js</js>
-		<js>classpath:META-INF/resources/webjars/handlebars/4.0.2/handlebars.js
+		<js>classpath:META-INF/resources/webjars/handlebars/4.7.6/dist/handlebars.js
 		</js>
 		<js>classpath:META-INF/resources/webjars/URI.js/1.14.1/URI.js</js>
-		<js>classpath:META-INF/resources/webjars/momentjs/2.8.3/moment.js</js>
+		<js>classpath:META-INF/resources/webjars/momentjs/2.24.0/moment.js</js>
 		<js>classpath:META-INF/resources/webjars/riot/2.4.1/riot.js</js>
 		<js>classpath:META-INF/resources/webjars/chart.js/2.2.2/dist/Chart.js
 		</js>
