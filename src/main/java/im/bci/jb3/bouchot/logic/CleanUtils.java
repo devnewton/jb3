@@ -1,5 +1,7 @@
 package im.bci.jb3.bouchot.logic;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -76,11 +78,11 @@ public class CleanUtils {
         }
         return nickname;
     }
-    
+
     public static String truncateAndCleanNickname(String nickname) {
         return cleanNickname(truncateNickname(nickname));
     }
-    
+
     public static String truncateAndCleanStatus(String status) {
         return cleanStatus(truncateStatus(status));
     }
@@ -108,6 +110,19 @@ public class CleanUtils {
             title = Jsoup.clean(title, Whitelist.none());
         }
         return title;
+    }
+
+    private static final Pattern INVALID_CHARACTER_IN_FILENAME = Pattern.compile("\\W");
+
+    public static String encodeFilename(String unsafeFilename) {
+        StringBuilder safeFilename = new StringBuilder();
+        Matcher matcher = INVALID_CHARACTER_IN_FILENAME.matcher(unsafeFilename);
+        while (matcher.find()) {
+            String replacement = "%" + Integer.toHexString(matcher.group().charAt(0)).toUpperCase();
+            matcher.appendReplacement(safeFilename, replacement);
+        }
+        matcher.appendTail(safeFilename);
+        return safeFilename.toString();
     }
 
 }
