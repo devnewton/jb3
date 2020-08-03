@@ -19,27 +19,25 @@ class Jb3 {
         jb3_common.getRooms().forEach((room) => {
             this.rooms[room.rname] = {};
         });
-        let uri = URI(window.location);
-        let roomInURI = uri.search(true).room;
+        let uri = new URL(window.location);
+        let roomInURI = uri.searchParams.get("room");
         if (roomInURI) {
-        	this.rooms[roomInURI] = {};
+            this.rooms[roomInURI] = {};
         }
         this.controlsRoom.empty().append(
                 Object.keys(this.rooms).sort().map((room) => {
             return new Option(room, room);
         })
                 );
-        let roomInDomain = uri.domain().slice(0, -uri.tld().length - 1);
-        roomInDomain = this.rooms[roomInDomain] && roomInDomain;
-        this.controlsRoom.attr("size", Math.min(this.controlsRoom.find('option').length, 10));
-        this.controlsRoom.val(roomInURI || roomInDomain || localStorage.selectedRoom || this.controlsRoom.find('option').first().val());
+        this.controlsRoom.attr("size", Math.min(this.controlsRoom.find("option").length, 10));
+        this.controlsRoom.val(roomInURI || localStorage.selectedRoom || this.controlsRoom.find('option').first().val());
         this.controlsMessage.attr("placeholder", this.controlsRoom.val());
         let postsContainer = document.getElementById('jb3-posts-container');
         for (let room in this.rooms) {
             let postsDivForRoom = document.createElement("div");
             postsDivForRoom.dataset.room = room;
             postsDivForRoom.className += "jb3-posts";
-            if (room != this.controlsRoom.val()) {
+            if (room !== this.controlsRoom.val()) {
                 postsDivForRoom.setAttribute('style', 'display:none')
             }
             postsContainer.appendChild(postsDivForRoom);

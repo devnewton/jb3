@@ -15,7 +15,6 @@
 		<js>classpath:META-INF/resources/webjars/jquery/3.5.1/jquery.js</js>
 		<js>classpath:META-INF/resources/webjars/handlebars/4.7.6/dist/handlebars.js
 		</js>
-		<js>classpath:META-INF/resources/webjars/URI.js/1.14.1/URI.js</js>
 		<js>classpath:META-INF/resources/webjars/momentjs/2.24.0/moment.js</js>
 		<js>classpath:META-INF/resources/webjars/riot/2.4.1/riot.js</js>
 		<js>classpath:META-INF/resources/webjars/chart.js/2.2.2/dist/Chart.js
