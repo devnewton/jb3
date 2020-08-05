@@ -66,7 +66,11 @@ public class Tribune {
         if (!posts.isEmpty()) {
             Fortune f = new Fortune();
             f.setFortuner(post.getCleanedNickname());
-            f.setTitle(CleanUtils.truncateFortuneTitle(StringUtils.removeStart(parsed.getRemainingMessageContent(), "/fortune ")));
+            String fortuneTitle = parsed.getRemainingMessageContent();
+            fortuneTitle = StringUtils.removeStart(fortuneTitle, "/fortune ");
+            fortuneTitle = StringUtils.removeStart(fortuneTitle, "fortune< ");
+            fortuneTitle = CleanUtils.truncateFortuneTitle(fortuneTitle);
+            f.setTitle(fortuneTitle);
             f.setPosts(posts);
             return fortunePepository.save(f);
         } else {
