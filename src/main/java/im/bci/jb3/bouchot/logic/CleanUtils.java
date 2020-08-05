@@ -2,6 +2,7 @@ package im.bci.jb3.bouchot.logic;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.gcardone.junidecode.Junidecode;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -9,8 +10,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.safety.Cleaner;
 import org.jsoup.safety.Whitelist;
-
-import net.sf.junidecode.Junidecode;
 
 /**
  *
