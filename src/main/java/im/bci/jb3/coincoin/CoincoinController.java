@@ -28,10 +28,5 @@ public class CoincoinController {
                 model.addAttribute("jb3DefaultsRooms", defaultsRooms);
 		return "rooms/rooms";
 	}
-	
-	@RequestMapping(path = "/paste", method = RequestMethod.GET)
-	public String paste(Model model) {
-		return "paste/paste";
-	}
 
 }
