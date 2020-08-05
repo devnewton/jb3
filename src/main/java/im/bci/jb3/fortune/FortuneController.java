@@ -20,7 +20,6 @@ public class FortuneController {
 
     @RequestMapping(path="", method = RequestMethod.GET)
     public String index(FortuneSearchRQ rq, Model model) {
-        model.addAttribute("wro-group", "fortunes");
         model.addAttribute("rq", rq);
         model.addAttribute("fortunes", fortuneRepository.search(rq));
         return "fortunes/fortunes";

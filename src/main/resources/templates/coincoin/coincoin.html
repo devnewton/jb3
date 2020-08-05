@@ -5,7 +5,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex,nofollow">
-{{> partials/css}}
+<link rel="stylesheet" type="text/css" href="/webjars/blaze/3.2.0/dist/blaze.min.css">
+<link rel="stylesheet" type="text/css" href="/assets/common/reset.css">
+<link rel="stylesheet" type="text/css" href="/assets/common/posts.css">
+<link rel="stylesheet" type="text/css" href="/assets/coincoin/coincoin.css">
 <link rel="icon" type="image/png" href="/favicon.png">
 </head>
 <body class="c-text">
@@ -43,6 +46,28 @@
         <jb3-revisions-modal></jb3-revisions-modal>
     {{> partials/defaults}}
     {{raw-include "partials/message-template"}}
-    {{> partials/js}}
+    <script src="/webjars/jquery/3.5.1/jquery.js" defer></script>
+    <script src="/webjars/handlebars/4.7.6/dist/handlebars.js" defer></script>
+    <script src="/webjars/momentjs/2.24.0/moment.js" defer></script>
+    <script src="/webjars/riot/2.4.1/riot.js" defer></script>
+    <script src="/webjars/chart.js/2.2.2/dist/Chart.js" defer></script>
+    <script src="/webjars/hammerjs/2.0.8/hammer.js" defer></script>
+    <script src="/assets/thirdparty/responsive-sketchpad.js" defer></script>
+    <script src="/assets/tags/jb3-moules-roster--tag.js" defer></script>
+    <script src="/assets/tags/jb3-raw--tag.js" defer></script>
+    <script src="/assets/tags/paste/jb3-paste-emoji--tag.js" defer></script>
+    <script src="/assets/tags/paste/jb3-paste-file--tag.js" defer></script>
+    <script src="/assets/tags/paste/jb3-paste-record--tag.js" defer></script>
+    <script src="/assets/tags/paste/jb3-paste-sketch--tag.js" defer></script>
+    <script src="/assets/tags/paste/jb3-paste-text--tag.js" defer></script>
+    <script src="/assets/tags/paste/jb3-paste-totoz--tag.js" defer></script>
+    <script src="/assets/tags/paste/jb3-paste-form--tag.js" defer></script>
+    <script src="/assets/tags/jb3-modal--tag.js" defer></script>
+    <script src="/assets/tags/jb3-paste-modal--tag.js" defer></script>
+    <script src="/assets/tags/jb3-revisions-modal--tag.js" defer></script>
+    <script src="/assets/common/post-to-html.js" defer></script>
+    <script src="/assets/common/common.js" defer></script>
+    <script src="/assets/coincoin/trollometre.js" defer></script>
+    <script src="/assets/coincoin/coincoin.js" defer></script>
 </body>
 </html>

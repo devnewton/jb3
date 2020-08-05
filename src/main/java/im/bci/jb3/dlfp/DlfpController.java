@@ -50,7 +50,6 @@ public class DlfpController {
         } catch (Exception ex) {
             LogFactory.getLog(this.getClass()).error("dlfp oauth error", ex);
         }
-        model.addAttribute("wro-group", "dlfp");
         return "dlfp/connected";
     }
 

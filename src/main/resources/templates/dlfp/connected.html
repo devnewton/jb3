@@ -5,7 +5,8 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="robots" content="noindex,nofollow">
-        {{> partials/css}}
+        <link rel="stylesheet" type="text/css" href="/webjars/blaze/3.2.0/dist/blaze.min.css">
+        <link rel="stylesheet" type="text/css" href="/assets/common/reset.css">
         <link rel="icon" type="image/png" href="/favicon.png">
     </head>
     <body class="c-text">
@@ -45,6 +46,5 @@
             }));
             localStorage.setItem('dlfp-login', '{{ login }}');
         </script>
-        {{> partials/js}}
     </body>
 </html>

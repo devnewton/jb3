@@ -26,7 +26,6 @@ public class ArchivesController {
 
 	@RequestMapping(path = "", method = RequestMethod.GET)
 	public String index(Model model, PostSearchRQ rq) {
-		model.addAttribute("wro-group", "archives");
 		model.addAttribute("rq", rq);
 		model.addAttribute("postsMV", searchPosts(rq));
 		return "archives/archives";

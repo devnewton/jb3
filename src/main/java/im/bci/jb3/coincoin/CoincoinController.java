@@ -20,20 +20,17 @@ public class CoincoinController {
 	public String index(Model model) {
 		model.addAttribute("jb3DefaultRoom", defaultRoom);
                 model.addAttribute("jb3DefaultsRooms", defaultsRooms);
-		model.addAttribute("wro-group", "coincoin");
 		return "coincoin/coincoin";
 	}
 
 	@RequestMapping(path = "/rooms", method = RequestMethod.GET)
 	public String rooms(Model model) {
                 model.addAttribute("jb3DefaultsRooms", defaultsRooms);
-		model.addAttribute("wro-group", "rooms");
 		return "rooms/rooms";
 	}
 	
 	@RequestMapping(path = "/paste", method = RequestMethod.GET)
 	public String paste(Model model) {
-		model.addAttribute("wro-group", "paste");
 		return "paste/paste";
 	}
 
