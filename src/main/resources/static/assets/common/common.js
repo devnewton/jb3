@@ -63,7 +63,7 @@ class Jb3Common {
 			                if (xhr.status === 200) {
 			                	if (url.find('.jb3-url-preview').length === 0) {
 				                    let preview = JSON.parse(xhr.response);
-				                    let previewFigure = `<figure class="jb3-url-preview">${preview.image ? `<img src="${preview.image}" />`:``}<figcaption>${preview.title}</figcaption></figure>`;
+				                    let previewFigure = `<figure class="jb3-url-preview">${preview.image ? `<img src="${preview.image}" />`:``}<figcaption><h4>${preview.title}</h4>${preview.description}</figcaption></figure>`;
 				                    url.append(previewFigure);
 			                	}
 			                }
