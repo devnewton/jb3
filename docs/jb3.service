@@ -39,3 +39,11 @@ Environment=JB3_PASTE_MAXFILES=100
 # follow the https://linuxfr.org/developpeur instruction to get theses values
 Environment=JB3_DLFP_OAUTH_CLIENT_ID=changeme
 Environment=JB3_DLFP_OAUTH_CLIENT_SECRET=changeme
+
+ExecStart=/srv/jb3/jb3-1.2-SNAPSHOT.jar
+SuccessExitStatus=143
+Restart=always
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target
