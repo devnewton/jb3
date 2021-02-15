@@ -148,6 +148,7 @@
                     <include>**/*.tag</include>
                     <include>**/*.css</include>
                     <include>**/*.png</include>
+                    <include>**/*.gif</include>
                     <include>**/*.svg</include>
                 </includes>
             </resource>

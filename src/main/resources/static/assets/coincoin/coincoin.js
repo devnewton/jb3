@@ -62,13 +62,15 @@ class Jb3 {
             this.updateNotifications();
         });
         this.controlsMessage.bind('keydown', (event) => {
-            if (event.altKey) {
-                if (this.handleAltShortcut(event.key)) {
-                    event.stopPropagation();
-                    event.preventDefault();
+            if(!this.controlsMessage.prop('disabled')) {
+                if (event.altKey) {
+                    if (this.handleAltShortcut(event.key)) {
+                        event.stopPropagation();
+                        event.preventDefault();
+                    }
+                } else if (event.keyCode === 13) {
+                    this.postCurrentMessage();
                 }
-            } else if (event.keyCode === 13) {
-            	this.postCurrentMessage();
             }
         });
         if ($('header').css('display') === 'block') {
@@ -217,16 +219,25 @@ class Jb3 {
             data.append("nickname", this.controlsNickname.val());
             data.append("room", selectedRoom);
             data.append("auth", auth);
-            fetch("/ssecoin/posts/add", {
-                method: 'POST',  
-                body: data
-            }
-            ).then(response => {
-                if(response.ok) {
-                    this.controlsMessage.val('');
+            this.controlsMessage.prop('disabled', true);
+            this.controlsMessage.addClass('jb3-loading');
+            jb3_common.withTimeout(30000, async (signal) => {
+                try {
+                    const response = await fetch("/ssecoin/posts/add", {
+                        method: 'POST',  
+                        body: data,
+                        signal: signal
+                    });
+                    if(response.ok) {
+                        this.controlsMessage.val('');
+                    }
+                } catch(error) {
+                    console.log(error);
+                } finally {
+                    this.controlsMessage.removeClass('jb3-loading');
+                    this.controlsMessage.prop('disabled', false);
                 }
-            } );
-            
+            });
         }
     }
     
@@ -544,28 +555,32 @@ class Jb3 {
     }
     
     insertTextInMessageControl(text, pos) {
-        let control = document.getElementById("jb3-controls-message");
-        if (!pos) {
-            pos = text.length;
+        if(!this.controlsMessage.prop('disabled')) {
+            let control = document.getElementById("jb3-controls-message");
+            if (!pos) {
+                pos = text.length;
+            }
+            let selectionEnd = control.selectionStart + pos;
+            control.value = control.value.substring(0, control.selectionStart) + text + control.value.substr(control.selectionEnd);
+            control.focus();
+            control.setSelectionRange(selectionEnd, selectionEnd);
         }
-        let selectionEnd = control.selectionStart + pos;
-        control.value = control.value.substring(0, control.selectionStart) + text + control.value.substr(control.selectionEnd);
-        control.focus();
-        control.setSelectionRange(selectionEnd, selectionEnd);
     }
     
     insertTextWithSpacesAroundInMessageControl(text) {
-        let control = document.getElementById("jb3-controls-message");
-        let textBefore = control.value.substring(0, control.selectionStart);
-        if (/.*\S$/.test(textBefore)) {
-            textBefore = textBefore.concat(" ");
+        if(!this.controlsMessage.prop('disabled')) {
+            let control = document.getElementById("jb3-controls-message");
+            let textBefore = control.value.substring(0, control.selectionStart);
+            if (/.*\S$/.test(textBefore)) {
+                textBefore = textBefore.concat(" ");
+            }
+            let textAfter = control.value.substr(control.selectionStart);
+            let firstPart = textBefore.concat(text).concat(' ');
+            let caretPos = firstPart.length;
+            control.value = firstPart.concat(textAfter);
+            control.focus();
+            control.setSelectionRange(caretPos, caretPos);
         }
-        let textAfter = control.value.substr(control.selectionStart);
-        let firstPart = textBefore.concat(text).concat(' ');
-        let caretPos = firstPart.length;
-        control.value = firstPart.concat(textAfter);
-        control.focus();
-        control.setSelectionRange(caretPos, caretPos);
     }
     
     initTrollometre() {

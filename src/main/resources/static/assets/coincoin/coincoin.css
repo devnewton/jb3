@@ -122,3 +122,12 @@ header {
     width: 100%;
     padding-bottom: 5px;
 }
+ 
+.jb3-loading {
+    background-attachment: scroll;
+    background-color: transparent;
+    background-image: url("/assets/icons/loading.gif");
+    background-position: right center;
+    background-repeat: no-repeat;
+    background-size: 1em;
+}
