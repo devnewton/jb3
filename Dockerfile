@@ -20,4 +20,4 @@ RUN ["mvn", "package"]
 
 EXPOSE 27017
 EXPOSE 8080
-ENTRYPOINT service mongodb start && java -jar target/jb3-1.2-SNAPSHOT.jar
+ENTRYPOINT service mongodb start && java -jar target/jb3-1.3-SNAPSHOT.jar

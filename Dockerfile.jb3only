@@ -14,7 +14,7 @@ FROM adoptopenjdk/openjdk11:alpine-slim as distribution
 
 WORKDIR /code
 
-COPY --from=build /jb3/target/jb3-1.2-SNAPSHOT.jar /code/
+COPY --from=build /jb3/target/jb3-1.3-SNAPSHOT.jar /code/
 
 EXPOSE 8080
-ENTRYPOINT java -jar jb3-1.2-SNAPSHOT.jar
+ENTRYPOINT java -jar jb3-1.3-SNAPSHOT.jar
